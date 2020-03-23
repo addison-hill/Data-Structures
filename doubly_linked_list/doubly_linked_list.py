@@ -84,7 +84,7 @@ class DoublyLinkedList:
         self.length += 1
         if not self.head and not self.tail:
             self.head = new_node
-            self.talk = new_node
+            self.tail = new_node
         else:
             new_node.prev = self.tail
             self.tail.next = new_node
