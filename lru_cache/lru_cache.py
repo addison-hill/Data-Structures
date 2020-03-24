@@ -1,3 +1,6 @@
+from doubly_linked_list import DoublyLinkedList
+
+
 class LRUCache:
     """
     Our LRUCache class keeps track of the max number of nodes it
@@ -6,8 +9,17 @@ class LRUCache:
     order, as well as a storage dict that provides fast access
     to every node stored in the cache.
     """
+    # Least Recently Used...so when reach limit new entry will override the least recently used
+    # example: [0, 1, 2] if you placed 0 first then 1 then 2. If you wanted to place 3, it would override 0
+
+    # data structures that offer order: arrays, linked lists
+    # DLL will be more efficient because in an array everytime you remove, everything has to be shifted
+
     def __init__(self, limit=10):
-        pass
+        self.limit = limit  # declare limit as an attribute
+        self.size = 0  # declare the size, so we can compare the size to the limit
+        self.order = DoublyLinkedList()
+        self.storage = {}  # initialize storage as a dictionary
 
     """
     Retrieves the value associated with the given key. Also
@@ -16,8 +28,16 @@ class LRUCache:
     Returns the value associated with the key or None if the
     key-value pair doesn't exist in the cache.
     """
+
     def get(self, key):
-        pass
+        # update items if used
+        # find the key in order structure, and move to front
+        if key in self.storage:
+            node = self.storage[key]
+            self.order.move_to_front(node)
+            return node.value[1]
+        else:
+            return None
 
     """
     Adds the given key-value pair to the cache. The newly-
@@ -29,5 +49,32 @@ class LRUCache:
     want to overwrite the old value associated with the key with
     the newly-specified value.
     """
+
+    # key is not in storage, and limit has not been hit
+    # add the key to the front of the order structure
+    # key is in storage
+    # find the key in order, and move to front
+    # what if self.size == self.limit?
+    # either head or tail, that node will be removed
+    # delete from dict
+
     def set(self, key, value):
-        pass
+        # remove items that arent used
+        if key in self.storage:  # if a key already exists override old value with new value
+            node = self.storage[key]
+            node.value = (key, value)
+            self.order.move_to_front(node)
+            return
+        if self.size == self.limit:
+            # how to delete item from dict python
+            # Delete LRU from storage
+            del self.storage[self.order.tail.value[0]]
+            self.order.remove_from_tail()  # remove tail node (LRU) from our DLL
+            self.size -= 1
+
+        # add the node to storage
+        # add our node to head of DLL inserting given key, value
+        self.order.add_to_head((key, value))
+        # add it to our cache at the given key
+        self.storage[key] = self.order.head
+        self.size += 1
